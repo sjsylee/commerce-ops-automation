@@ -146,10 +146,10 @@ pnpm build
 
 ## 🛠️ 트러블슈팅 / Troubleshooting
 
-구현 중 실제로 발생한 에러 중 재현성과 영향도가 큰 항목만 남겼습니다.<br />
-Only reproducible issues that affected verification or documentation quality are listed here.
+구현 중 실제로 발생했고 검증 흐름까지 개선한 에러만 남겼습니다.<br />
+Only the issue that led to a concrete verification improvement is listed here.
 
-### P1. Next.js 생성 타입 누락으로 Web 검증 실패 / Missing Next.js Generated Types
+### Next.js 생성 타입 누락으로 Web 검증 실패 / Missing Next.js Generated Types
 
 - **발생 명령 / Command**: `pnpm test`
 - **에러 / Error**:
@@ -163,23 +163,6 @@ Only reproducible issues that affected verification or documentation quality are
 - **원인 / Cause**: `apps/web/tsconfig.json`이 `.next/types/**/*.ts`를 include하고 있었지만, `test`와 `typecheck` 스크립트는 `tsc --noEmit`만 실행했습니다. `.next/types`는 `next build`, `next dev`, 또는 `next typegen` 이후에 생기기 때문에 clean checkout이나 병렬 검증 순서에서는 타입 파일이 없는 상태로 `tsc`가 먼저 실행됐습니다.
 - **해결 / Resolution**: Web package의 `test`와 `typecheck`를 `next typegen && tsc -p tsconfig.json --noEmit`으로 변경해 검증 전에 Next.js route/page/layout 타입 생성을 보장했습니다.
 - **배운 점 / Lesson**: Next.js App Router 프로젝트에서 `.next/types`를 TypeScript program에 포함한다면, 검증 명령 자체가 typegen 선행 조건을 가져야 합니다. build 산출물이 우연히 남아 있는 로컬 상태에 기대면 CI나 새 환경에서 같은 명령이 실패합니다.
-
-### P2. README 스크린샷 갱신 중 Playwright 브라우저 캐시 불일치 / Playwright Browser Cache Mismatch
-
-- **발생 작업 / Task**: 한국어 UI로 변경한 뒤 README용 데스크톱/모바일 스크린샷 재생성
-- **에러 / Error**:
-
-```txt
-browserType.launch: Executable doesn't exist at
-.../chromium_headless_shell-1223/chrome-headless-shell
-
-FATAL: mach_port_rendezvous_mac.cc:159
-bootstrap_check_in ... Permission denied (1100)
-```
-
-- **원인 / Cause**: 캡처 스크립트에서 사용한 Playwright 버전은 `chromium_headless_shell-1223`을 기대했지만 로컬 캐시에는 이전 revision만 있었습니다. 또한 제한된 실행 환경에서 macOS headless Chromium을 직접 띄우면 Mach port 권한 문제로 브라우저가 종료됐습니다.
-- **해결 / Resolution**: `pnpm exec playwright install chromium`으로 브라우저 캐시를 확인하고, 실제 존재하는 Chromium 실행 파일을 `executablePath`로 명시한 캡처 스크립트를 브라우저 실행 권한이 있는 shell에서 실행했습니다. 이후 `docs/screenshots/desktop-console.png`, `docs/screenshots/mobile-console.png`를 직접 열어 한국어 문구와 모바일 줄바꿈을 검수했습니다.
-- **배운 점 / Lesson**: README에 UI 이미지를 포함할 때는 단순 캡처 파일 생성이 아니라 재현 가능한 visual QA 절차가 필요합니다. 브라우저 revision, 실행 권한, viewport, 실제 이미지 검수까지 기록해야 스크린샷이 코드와 따로 노는 문제를 줄일 수 있습니다.
 
 ## 🧾 공개 범위 / Public Scope
 
