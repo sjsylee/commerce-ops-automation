@@ -1,51 +1,65 @@
-# Commerce Ops Automation
+# Commerce Ops Automation | 커머스 운영 자동화
 
+`Margin Studio`는 매입 등록, 원가 검토, 가격 점검, 정산 후보 매칭을 한 화면에서 처리하기 위한 커머스 운영 콘솔입니다.  
 `Margin Studio` is a commerce operations console for purchase intake, landed-cost review, pricing checks, and settlement matching.
 
-This repository is a public case-study implementation. It preserves the engineering shape of a production-grade operations system while replacing customer data, proprietary formulas, and external partner details with anonymized sample data and a public calculation policy.
+고객 데이터, 핵심 산식, 외부 파트너 연동 세부사항은 제외하고, 운영 자동화 시스템의 구조와 구현 역량을 검증할 수 있도록 재구성한 공개 포트폴리오 레포입니다.  
+This public case-study repository preserves the engineering shape of a production-grade operations system while replacing customer data, proprietary formulas, and partner details with anonymized sample data and a public calculation policy.
 
 ![Desktop console](docs/screenshots/desktop-console.png)
 
-## What This Shows
+## 🧰 기술 태그 / Tech Tags
 
-- A production-oriented monorepo split into `web`, `api`, `shared`, and `infra` workspaces.
-- A dense operator UI built for scanning queue state, margin health, sync status, and settlement confidence.
-- Shared zod schemas and deterministic calculation functions reused by both the Next.js app and NestJS API.
-- A NestJS module/controller/service boundary that can grow into real persistence, auth, and scheduled sync jobs.
-- Docker/Caddy infrastructure showing how the API is packaged and exposed behind a reverse proxy.
+![Next.js](https://img.shields.io/badge/Next.js-15-111827?style=flat-square&logo=nextdotjs)
+![React](https://img.shields.io/badge/React-19-2563EB?style=flat-square&logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![NestJS](https://img.shields.io/badge/NestJS-11-E0234E?style=flat-square&logo=nestjs&logoColor=white)
+![Zod](https://img.shields.io/badge/Zod-Schema-3E67B1?style=flat-square)
+![pnpm](https://img.shields.io/badge/pnpm-Workspace-F69220?style=flat-square&logo=pnpm&logoColor=white)
+![Turborepo](https://img.shields.io/badge/Turborepo-Monorepo-EF4444?style=flat-square&logo=turborepo&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Infra-2496ED?style=flat-square&logo=docker&logoColor=white)
+![Caddy](https://img.shields.io/badge/Caddy-Reverse_Proxy-1F88C0?style=flat-square)
 
-## For Hiring Reviewers
+`Next.js 15` · `React 19` · `NestJS 11` · `TypeScript` · `zod` · `pnpm workspace` · `Turborepo` · `Docker` · `Caddy`
 
-The project is designed to be reviewed quickly:
+## ✨ 핵심 요약 / Highlights
 
-- **Product judgment**: the first screen is not a marketing page; it is an operator workspace with queue, automation, and review surfaces.
-- **Frontend execution**: responsive layout, high-density information design, state badges, rail navigation, and mobile-first stacking are implemented without relying on a UI kit.
-- **Backend structure**: the API keeps route handling, business policy, and shared validation in separate layers.
-- **Reliability mindset**: calculations are isolated in `packages/shared` and covered by a unit test.
-- **Deployment awareness**: `infra/docker` includes the API image and Caddy reverse proxy shape.
+- **실무형 모노레포 구조**: `web`, `api`, `shared`, `infra`를 분리해 프론트엔드, API, 공통 정책, 배포 구성을 독립적으로 검토할 수 있게 했습니다.  
+  **Production-oriented monorepo**: `web`, `api`, `shared`, and `infra` are separated for clear review boundaries.
+- **운영자 중심 UI**: queue 상태, margin health, sync status, settlement confidence를 빠르게 스캔할 수 있는 고밀도 작업 화면을 구현했습니다.  
+  **Operator-first UI**: the console is built for fast scanning of queue state, margin health, sync status, and settlement confidence.
+- **공유 검증 경계**: zod schema와 계산 정책을 `packages/shared`에 두어 Web/API가 같은 타입과 정책을 재사용합니다.  
+  **Shared validation boundary**: zod schemas and calculation policy are reused by both the Next.js app and NestJS API.
+- **확장 가능한 API 구조**: NestJS module/controller/service 경계를 유지해 persistence, auth, scheduled sync로 확장 가능한 형태를 보여줍니다.  
+  **Extensible API shape**: NestJS module/controller/service boundaries leave room for persistence, auth, and scheduled sync jobs.
+- **배포 고려 인프라**: Docker image와 Caddy reverse proxy 구성을 포함해 API 패키징과 노출 방식을 보여줍니다.  
+  **Deployment-aware infrastructure**: Docker and Caddy show how the API can be packaged and exposed behind a reverse proxy.
 
-## UI/UX
+## 🧑‍💼 채용 담당자 관점 / For Hiring Reviewers
+
+이 레포는 단순 CRUD 예제가 아니라, 반복적인 커머스 운영 업무를 제품, UI, API, 검증 경계로 분해한 사례입니다.  
+This is not a generic CRUD sample. It is a case study in turning repetitive commerce operations into product surfaces, API boundaries, and testable policy layers.
+
+- **제품 판단력 / Product judgment**: 첫 화면을 랜딩 페이지가 아니라 실제 운영자가 쓰는 작업면으로 구성했습니다.
+- **프론트엔드 구현력 / Frontend execution**: UI kit 없이 responsive layout, rail navigation, state badge, mobile stacking을 직접 구성했습니다.
+- **백엔드 구조화 / Backend structure**: route handling, service policy, shared validation을 분리했습니다.
+- **신뢰성 사고 / Reliability mindset**: 계산 로직을 `packages/shared`에 격리하고 단위 테스트를 추가했습니다.
+- **운영 관점 / Operations awareness**: `infra/docker`에 API Dockerfile, Caddy reverse proxy, compose 구성을 포함했습니다.
+
+## 🎛️ UI/UX
 
 ![Mobile console](docs/screenshots/mobile-console.png)
 
-Key interface decisions:
+- **제품명 중심 첫인상 / Product-led first impression**  
+  `Margin Studio`를 실제 제품처럼 보이게 구성하고, 운영 상태와 작업 큐가 바로 이어지도록 설계했습니다.
+- **운영자 우선 레이아웃 / Operator-first layout**  
+  데스크톱에서는 navigation, purchase ledger, automation status, review panel을 분리해 컨텍스트를 유지하며 검토할 수 있습니다.
+- **모바일 연속성 / Mobile continuity**  
+  모바일에서는 같은 흐름을 세로형 review path로 재배치해 search, filter, margin signal을 유지합니다.
+- **상태 중심 정보 구조 / Status-driven hierarchy**  
+  queue state, FX lock, cost review, settlement candidates를 보조 정보보다 먼저 볼 수 있게 했습니다.
 
-- **Product-led first impression**: `Margin Studio` is presented as a real tool, not a scaffold or dashboard template.
-- **Operator-first layout**: the desktop view separates navigation, ledger, automation status, and review detail so users can keep context while moving through items.
-- **Mobile continuity**: the same workflow collapses into a stacked review path without losing search, filters, or margin signals.
-- **Status-driven hierarchy**: queue state, FX lock, cost review, and settlement candidates are visible before secondary details.
-
-## Tech Stack
-
-| Area    | Stack                                                                  |
-| ------- | ---------------------------------------------------------------------- |
-| Web     | Next.js 15, React 19, TypeScript, lucide-react                         |
-| API     | NestJS 11, TypeScript                                                  |
-| Shared  | zod schemas, shared TypeScript types, deterministic calculation policy |
-| Infra   | Docker, Caddy                                                          |
-| Tooling | pnpm workspace, Turborepo, ESLint 9 flat config, Prettier              |
-
-## Repository Map
+## 🏗️ 아키텍처 / Architecture
 
 ```txt
 commerce-ops-automation/
@@ -63,29 +77,37 @@ commerce-ops-automation/
 └── README.md
 ```
 
-## Review Guide
+더 자세한 런타임 구조는 [docs/architecture.md](docs/architecture.md)에서 확인할 수 있습니다.  
+See [docs/architecture.md](docs/architecture.md) for the runtime architecture.
 
-Start here if you want to inspect implementation details:
+## 🔍 코드 리뷰 가이드 / Review Guide
 
-- UI composition: `apps/web/src/app/page.tsx`
-- Responsive visual system: `apps/web/src/app/globals.css`
-- Shared schema and calculation policy: `packages/shared/src/index.ts`
-- Calculation test: `packages/shared/src/index.test.ts`
-- API service boundary: `apps/api/src/modules/purchases`
-- Runtime architecture notes: `docs/architecture.md`
-- Docker/Caddy deployment shape: `infra/docker`
+구현을 검토하려면 아래 파일부터 보는 것을 추천합니다.  
+Recommended entry points for implementation review:
 
-## API Surface
+| 관심사 / Concern                     | 위치 / Path                         |
+| ------------------------------------ | ----------------------------------- |
+| UI composition                       | `apps/web/src/app/page.tsx`         |
+| Responsive visual system             | `apps/web/src/app/globals.css`      |
+| Shared schema and calculation policy | `packages/shared/src/index.ts`      |
+| Calculation unit test                | `packages/shared/src/index.test.ts` |
+| API service boundary                 | `apps/api/src/modules/purchases`    |
+| Runtime architecture notes           | `docs/architecture.md`              |
+| Docker/Caddy deployment shape        | `infra/docker`                      |
 
-The public API surface is intentionally small:
+## 🔌 API Surface
+
+공개 API는 의도적으로 작게 유지했습니다.  
+The public API surface is intentionally small.
 
 - `GET /api/health`
 - `GET /api/purchases`
 - `POST /api/purchases/quote`
 
+`POST /api/purchases/quote`는 shared zod schema로 입력을 검증하고 `packages/shared`의 공개 계산 정책 결과를 반환합니다.  
 `POST /api/purchases/quote` validates input with the shared zod schema and returns the public calculation result from `packages/shared`.
 
-## Local Development
+## 🚀 로컬 실행 / Local Development
 
 ```bash
 nvm use
@@ -93,19 +115,19 @@ pnpm install
 pnpm dev
 ```
 
-Default local ports:
+기본 로컬 포트 / Default local ports:
 
 - Web: `http://localhost:3010`
 - API: `http://localhost:4010/api`
 
-Run individual apps:
+개별 앱 실행 / Run individual apps:
 
 ```bash
 pnpm --filter @commerce-ops/web dev
 pnpm --filter @commerce-ops/api dev
 ```
 
-## Verification
+## ✅ 검증 / Verification
 
 ```bash
 pnpm lint
@@ -114,29 +136,29 @@ pnpm typecheck
 pnpm build
 ```
 
-Current checks cover:
+검증 항목 / Current checks:
 
-- ESLint flat-config linting across all workspaces
+- ESLint 9 flat config 기반 workspace lint
 - TypeScript strict-mode checks
 - Shared calculation unit test
 - Next.js production build
 - NestJS TypeScript build
 
-## Public Scope
+## 🧾 공개 범위 / Public Scope
 
-Included:
+포함한 것 / Included:
 
-- Operator console UI
-- Monorepo structure
-- API/service/shared package boundaries
-- Anonymized sample data
-- Public calculation policy
-- Docker/Caddy deployment shape
+- 운영 콘솔 UI / Operator console UI
+- 모노레포 구조 / Monorepo structure
+- API, service, shared package 경계 / API, service, and shared package boundaries
+- 비식별 샘플 데이터 / Anonymized sample data
+- 공개용 계산 정책 / Public calculation policy
+- Docker/Caddy 기반 배포 형태 / Docker/Caddy deployment shape
 
-Not included:
+포함하지 않은 것 / Not included:
 
-- Customer names or operating data
-- Contract, quote, or internal communication
-- Proprietary spreadsheet formulas
-- Real external partner endpoints or token flows
-- Production domains, secrets, or credentials
+- 고객사명 또는 운영 데이터 / Customer names or operating data
+- 계약, 견적, 내부 커뮤니케이션 / Contract, quote, or internal communication
+- 고유 스프레드시트 산식 / Proprietary spreadsheet formulas
+- 실제 외부 파트너 endpoint 또는 token flow / Real external partner endpoints or token flows
+- 운영 도메인, secret, credential / Production domains, secrets, or credentials
