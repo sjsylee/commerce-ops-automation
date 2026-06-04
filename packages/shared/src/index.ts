@@ -31,7 +31,7 @@ export const samplePurchases: SamplePurchase[] = [
     productName: "Air Force 1 Low",
     option: "270",
     styleCode: "AF1-270",
-    storeName: "Tokyo Store",
+    storeName: "도쿄 매장",
     status: "ready",
     marginRate: 18.7,
     publicInputs: {
@@ -48,7 +48,7 @@ export const samplePurchases: SamplePurchase[] = [
     productName: "Samba OG",
     option: "265",
     styleCode: "SB-265",
-    storeName: "Online CN",
+    storeName: "중국 온라인",
     status: "ready",
     marginRate: 15.2,
     publicInputs: {
@@ -65,7 +65,7 @@ export const samplePurchases: SamplePurchase[] = [
     productName: "Gel-Kayano 14",
     option: "280",
     styleCode: "GK14-280",
-    storeName: "Osaka Store",
+    storeName: "오사카 매장",
     status: "review",
     marginRate: 9.8,
     publicInputs: {
@@ -82,7 +82,7 @@ export const samplePurchases: SamplePurchase[] = [
     productName: "XT-6",
     option: "275",
     styleCode: "XT6-275",
-    storeName: "EU Partner",
+    storeName: "유럽 파트너",
     status: "ready",
     marginRate: 21.4,
     publicInputs: {
@@ -96,15 +96,15 @@ export const samplePurchases: SamplePurchase[] = [
 ];
 
 export const sampleSyncStatus = [
-  { label: "FX snapshot", value: "09:20 KST" },
-  { label: "Inventory price", value: "2 min ago" },
-  { label: "Settlement import", value: "No backlog" },
+  { label: "환율 기준 시각", value: "09:20 기준" },
+  { label: "재고 가격", value: "2분 전" },
+  { label: "정산 가져오기", value: "대기 없음" },
 ] as const;
 
 export const sampleSettlements = [
-  { id: "match_001", label: "Order reference", confidence: "96%" },
-  { id: "match_002", label: "SKU and option", confidence: "88%" },
-  { id: "match_003", label: "Manual review", confidence: "Needed" },
+  { id: "match_001", label: "주문 기준값", confidence: "96%" },
+  { id: "match_002", label: "상품/옵션 일치", confidence: "88%" },
+  { id: "match_003", label: "수동 검토", confidence: "필요" },
 ] as const;
 
 export function calculateSampleUnitEconomics(input: PurchasePublicInput) {
