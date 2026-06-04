@@ -144,6 +144,19 @@ pnpm build
 - Next.js production build
 - NestJS TypeScript build
 
+## 🛠️ 트러블슈팅 / Troubleshooting
+
+공개 가능한 기술 사례로 정리하며 아래 문제를 확인하고 해결했습니다.<br />
+The following issues were found and resolved while preparing this public technical case study.
+
+| 문제 / Issue                               | 원인 / Cause                                                 | 해결 / Resolution                                                      |
+| ------------------------------------------ | ------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| Web이 최신 shared 데이터를 반영하지 않음   | `@commerce-ops/shared`가 stale `dist` entry를 참조           | package `exports`를 정리하고 shared build 흐름을 검증                  |
+| Next.js build에서 workspace root 경고 발생 | 상위 경로의 다른 lockfile을 Next가 workspace root로 추론     | `outputFileTracingRoot`를 monorepo root로 명시                         |
+| Next.js build와 lint 책임이 섞임           | Next build 내장 lint와 ESLint 9 flat config 조합의 감지 경고 | `pnpm lint`를 별도 검증 단계로 분리하고 build는 type/build 책임에 집중 |
+| README 문체가 작업 기록처럼 보일 위험      | 구현 배경을 과하게 설명하면 기술 사례의 밀도가 낮아짐        | 한글 우선, 영어 병기, 구현 중심 문체로 재작성                          |
+| 민감한 도메인 정보 노출 가능성             | 고객명, 고유 산식, 외부 연동 정보는 공개 문서에 부적합       | 비식별 샘플 데이터와 공개용 계산 정책만 유지                           |
+
 ## 🧾 공개 범위 / Public Scope
 
 포함한 것 / Included:
