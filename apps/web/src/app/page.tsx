@@ -66,11 +66,11 @@ export default function HomePage() {
         </button>
       </aside>
 
-      <section className="studio-main" aria-label="마진 스튜디오 작업 화면">
+      <section className="studio-main" aria-label="Margin Studio 작업 화면">
         <header className="studio-header">
           <div className="title-stack">
             <p>재고 마진 관리</p>
-            <h1>마진 스튜디오</h1>
+            <h1>Margin Studio</h1>
             <span>매입 장부, 원가, 가격, 정산 후보를 한곳에서 관리합니다.</span>
           </div>
           <div className="header-actions">

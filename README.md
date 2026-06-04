@@ -1,6 +1,6 @@
 # Commerce Ops Automation | 커머스 운영 자동화
 
-`마진 스튜디오`는 매입 등록, 원가 검토, 가격 점검, 정산 후보 매칭을 한 화면에서 처리하기 위한 커머스 운영 콘솔입니다.<br />
+`Margin Studio`는 매입 등록, 원가 검토, 가격 점검, 정산 후보 매칭을 한 화면에서 처리하기 위한 커머스 운영 콘솔입니다.<br />
 `Margin Studio` is a commerce operations console for purchase intake, landed-cost review, pricing checks, and settlement matching.
 
 고객 데이터, 핵심 산식, 외부 파트너 연동 세부사항은 제외하고, 운영 자동화 시스템의 구조와 구현 역량을 검증할 수 있도록 재구성한 공개 포트폴리오 레포입니다.  
@@ -51,7 +51,7 @@ Repetitive commerce operations are separated into product surfaces, API boundari
 ![Mobile console](docs/screenshots/mobile-console.png)
 
 - **제품명 중심 첫인상 / Product-led first impression**  
-  `마진 스튜디오`를 실제 제품처럼 보이게 구성하고, 운영 상태와 작업 큐가 바로 이어지도록 설계했습니다.
+  `Margin Studio`를 실제 제품처럼 보이게 구성하고, 운영 상태와 작업 큐가 바로 이어지도록 설계했습니다.
 - **운영자 우선 레이아웃 / Operator-first layout**  
   데스크톱에서는 내비게이션, 매입 장부, 자동화 상태, 검토 패널을 분리해 컨텍스트를 유지하며 검토할 수 있습니다.
 - **모바일 연속성 / Mobile continuity**  
