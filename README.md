@@ -146,43 +146,40 @@ pnpm build
 
 ## 🛠️ 트러블슈팅 / Troubleshooting
 
-아래 항목은 구현과 빌드 검증 과정에서 확인한 문제를 `증상 → 원인 → 해결 → 배운 점`으로 정리한 내용입니다.<br />
-The notes below summarize engineering issues found during implementation and build verification.
+구현 중 실제로 발생한 에러 중 재현성과 영향도가 큰 항목만 남겼습니다.<br />
+Only reproducible issues that affected verification or documentation quality are listed here.
 
-### 1. 워크스페이스 패키지 해석과 오래된 빌드 산출물 / Workspace Package Resolution
+### P1. Next.js 생성 타입 누락으로 Web 검증 실패 / Missing Next.js Generated Types
 
-- **증상 / Symptom**: Web과 API가 `@commerce-ops/shared`를 함께 사용하면서, 개발 환경에서는 TypeScript source를 바로 보고 싶지만 production build/runtime에서는 `dist` JavaScript가 필요했습니다. `main`만 `dist`를 바라보게 두면 shared를 수정한 뒤 소비 앱이 오래된 build output을 참조할 수 있고, 반대로 source만 바라보면 NestJS runtime과 Docker image에서 실행 가능한 JavaScript artifact가 부족해질 수 있었습니다.
-- **원인 / Cause**: monorepo 내부 패키지는 개발 시점의 source resolution과 배포 시점의 artifact resolution이 다릅니다. 이 경계를 package metadata와 build graph에 명시하지 않으면 앱마다 같은 패키지를 다른 방식으로 해석합니다.
-- **해결 / Resolution**: `packages/shared/package.json`에 `exports`를 두어 `types`, `development`, `default` entry를 분리했고, Next.js에는 `transpilePackages: ["@commerce-ops/shared"]`를 지정했습니다. Turbo는 `build.dependsOn: ["^build"]`로 shared build가 소비 앱보다 먼저 실행되도록 구성했습니다.
-- **배운 점 / Lesson**: workspace package는 단순 경로 alias가 아니라 배포 단위입니다. 개발 편의성 때문에 source만 노출하면 runtime 검증이 약해지고, `dist`만 노출하면 frontend 개발 피드백이 늦어집니다.
+- **발생 명령 / Command**: `pnpm test`
+- **에러 / Error**:
 
-### 2. 중첩 모노레포에서 Next.js output tracing root 고정 / Next.js Output Tracing Root
+```txt
+@commerce-ops/web:test: error TS6053: File 'apps/web/.next/types/app/layout.ts' not found.
+@commerce-ops/web:test: error TS6053: File 'apps/web/.next/types/app/page.ts' not found.
+@commerce-ops/web:test: error TS6053: File 'apps/web/.next/types/cache-life.d.ts' not found.
+```
 
-- **증상 / Symptom**: Next.js build에서 workspace root 추론 경고가 발생했고, 상위 디렉터리에 있는 다른 lockfile을 기준으로 output tracing root가 잡힐 수 있었습니다.
-- **원인 / Cause**: 중첩된 workspace 환경에서는 상위 디렉터리의 lockfile이 framework root 추론에 영향을 줄 수 있습니다. Next.js의 file tracing은 lockfile과 workspace root를 기준으로 runtime에 필요한 파일을 추적하기 때문에, root 추론이 틀어지면 배포 산출물에서 필요한 workspace package가 누락될 위험이 있습니다.
-- **해결 / Resolution**: `apps/web/next.config.mjs`에서 `outputFileTracingRoot`를 monorepo root로 명시했습니다. 동시에 shared package는 `transpilePackages`에 포함해 Next build가 workspace dependency를 명확히 처리하도록 했습니다.
-- **배운 점 / Lesson**: 로컬에서 build가 성공하더라도 file tracing root가 불명확하면 배포 환경에서만 깨질 수 있습니다. nested workspace에서는 framework의 root 추론에 기대기보다 명시 설정으로 재현성을 확보하는 편이 안전합니다.
+- **원인 / Cause**: `apps/web/tsconfig.json`이 `.next/types/**/*.ts`를 include하고 있었지만, `test`와 `typecheck` 스크립트는 `tsc --noEmit`만 실행했습니다. `.next/types`는 `next build`, `next dev`, 또는 `next typegen` 이후에 생기기 때문에 clean checkout이나 병렬 검증 순서에서는 타입 파일이 없는 상태로 `tsc`가 먼저 실행됐습니다.
+- **해결 / Resolution**: Web package의 `test`와 `typecheck`를 `next typegen && tsc -p tsconfig.json --noEmit`으로 변경해 검증 전에 Next.js route/page/layout 타입 생성을 보장했습니다.
+- **배운 점 / Lesson**: Next.js App Router 프로젝트에서 `.next/types`를 TypeScript program에 포함한다면, 검증 명령 자체가 typegen 선행 조건을 가져야 합니다. build 산출물이 우연히 남아 있는 로컬 상태에 기대면 CI나 새 환경에서 같은 명령이 실패합니다.
 
-### 3. 금액 계산 정책의 런타임 검증 경계 / Calculation Policy Validation Boundary
+### P2. README 스크린샷 갱신 중 Playwright 브라우저 캐시 불일치 / Playwright Browser Cache Mismatch
 
-- **증상 / Symptom**: 매입 원가, 판매가, 수수료처럼 금액 계산에 직접 영향을 주는 입력값은 Web UI와 API 어느 한쪽에서만 검증하면 쉽게 불일치가 생깁니다. 특히 API body는 런타임에서는 `unknown`에 가깝기 때문에 타입만 믿고 service로 넘기면 잘못된 숫자가 계산 함수까지 도달할 수 있습니다.
-- **원인 / Cause**: TypeScript type은 compile-time 계약이고, API request body는 runtime data입니다. 계산 로직이 UI helper, API service, sample data에 흩어지면 같은 의미의 필드라도 검증 기준과 반올림 정책이 달라질 수 있습니다.
-- **해결 / Resolution**: `purchasePublicInputSchema`와 `calculateSampleUnitEconomics`를 `packages/shared`에 두고, API controller에서 `purchasePublicInputSchema.parse(body)`로 runtime validation을 먼저 수행한 뒤 service로 넘겼습니다. 계산 함수는 pure function으로 유지하고 `node:test` 기반 단위 테스트에서 landed cost, net sale, profit, profit rate를 고정했습니다.
-- **배운 점 / Lesson**: 금액 계산은 UI 표현 로직이 아니라 domain policy입니다. 입력 검증, 계산 함수, 테스트 fixture를 같은 패키지에 묶으면 Web/API가 같은 계약을 공유하고 회귀를 더 빨리 발견할 수 있습니다.
+- **발생 작업 / Task**: 한국어 UI로 변경한 뒤 README용 데스크톱/모바일 스크린샷 재생성
+- **에러 / Error**:
 
-### 4. ESLint 9 flat config와 build 책임 분리 / Build Responsibility
+```txt
+browserType.launch: Executable doesn't exist at
+.../chromium_headless_shell-1223/chrome-headless-shell
 
-- **증상 / Symptom**: Next.js build 단계와 lint 단계의 책임이 섞이면, production build가 코드 품질 검증까지 암묵적으로 떠안게 됩니다. ESLint 9 flat config 조합에서는 framework 내장 lint 감지 방식과 별도 workspace lint 흐름이 충돌하거나 경고를 만들 수 있습니다.
-- **원인 / Cause**: monorepo에서는 Web, API, shared package가 서로 다른 실행 환경을 갖습니다. build는 artifact 생성과 type-level 검증에 집중해야 하고, lint는 workspace 전체 규칙을 별도 task로 실행하는 편이 CI에서 원인을 파악하기 쉽습니다.
-- **해결 / Resolution**: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`를 분리했고, Next config에서는 `ignoreDuringBuilds: true`로 build 중 lint 실행을 끊었습니다. 대신 root `eslint.config.mjs`와 app-level config를 통해 lint를 명시 검증 단계로 유지했습니다.
-- **배운 점 / Lesson**: build command 하나에 모든 검증을 몰아넣으면 실패 원인이 흐려집니다. CI task를 역할별로 나누면 cache, failure message, 담당 영역이 분명해집니다.
+FATAL: mach_port_rendezvous_mac.cc:159
+bootstrap_check_in ... Permission denied (1100)
+```
 
-### 5. Docker runtime artifact 선별 / Docker Runtime Artifact Selection
-
-- **증상 / Symptom**: API Docker image는 compiled NestJS app을 실행해야 하므로 `apps/api/dist`만 복사하면 충분해 보이지만, 런타임 import가 `@commerce-ops/shared`를 참조하는 순간 shared package의 `package.json`과 `dist`도 함께 필요합니다.
-- **원인 / Cause**: monorepo package는 build-time dependency이면서 runtime dependency일 수 있습니다. TypeScript source가 로컬 workspace에 존재한다는 사실은 container runtime에서 아무 의미가 없고, Node는 package metadata와 JavaScript artifact를 기준으로 module을 해석합니다.
-- **해결 / Resolution**: `infra/docker/api.Dockerfile`에서 shared를 API보다 먼저 build하고, runner stage에 `apps/api/dist`, `packages/shared/package.json`, `packages/shared/dist`, production `node_modules`를 명시적으로 복사했습니다.
-- **배운 점 / Lesson**: Docker image는 로컬 repo의 축소판이 아니라 실행에 필요한 파일만 남긴 환경입니다. monorepo 배포에서는 어떤 package가 runtime에 필요한지 직접 추적해야 image가 작고 예측 가능해집니다.
+- **원인 / Cause**: 캡처 스크립트에서 사용한 Playwright 버전은 `chromium_headless_shell-1223`을 기대했지만 로컬 캐시에는 이전 revision만 있었습니다. 또한 제한된 실행 환경에서 macOS headless Chromium을 직접 띄우면 Mach port 권한 문제로 브라우저가 종료됐습니다.
+- **해결 / Resolution**: `pnpm exec playwright install chromium`으로 브라우저 캐시를 확인하고, 실제 존재하는 Chromium 실행 파일을 `executablePath`로 명시한 캡처 스크립트를 브라우저 실행 권한이 있는 shell에서 실행했습니다. 이후 `docs/screenshots/desktop-console.png`, `docs/screenshots/mobile-console.png`를 직접 열어 한국어 문구와 모바일 줄바꿈을 검수했습니다.
+- **배운 점 / Lesson**: README에 UI 이미지를 포함할 때는 단순 캡처 파일 생성이 아니라 재현 가능한 visual QA 절차가 필요합니다. 브라우저 revision, 실행 권한, viewport, 실제 이미지 검수까지 기록해야 스크린샷이 코드와 따로 노는 문제를 줄일 수 있습니다.
 
 ## 🧾 공개 범위 / Public Scope
 
