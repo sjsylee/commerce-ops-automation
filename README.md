@@ -35,16 +35,16 @@ This public case-study repository preserves the engineering shape of a productio
 - **배포 고려 인프라**: Docker image와 Caddy reverse proxy 구성을 포함해 API 패키징과 노출 방식을 보여줍니다.  
   **Deployment-aware infrastructure**: Docker and Caddy show how the API can be packaged and exposed behind a reverse proxy.
 
-## 🧑‍💼 채용 담당자 관점 / For Hiring Reviewers
+## 🧩 구현 포인트 / Implementation Notes
 
-이 레포는 단순 CRUD 예제가 아니라, 반복적인 커머스 운영 업무를 제품, UI, API, 검증 경계로 분해한 사례입니다.  
-This is not a generic CRUD sample. It is a case study in turning repetitive commerce operations into product surfaces, API boundaries, and testable policy layers.
+반복적인 커머스 운영 업무를 제품 화면, API 경계, 검증 가능한 정책 레이어로 분해했습니다.  
+Repetitive commerce operations are separated into product surfaces, API boundaries, and testable policy layers.
 
-- **제품 판단력 / Product judgment**: 첫 화면을 랜딩 페이지가 아니라 실제 운영자가 쓰는 작업면으로 구성했습니다.
-- **프론트엔드 구현력 / Frontend execution**: UI kit 없이 responsive layout, rail navigation, state badge, mobile stacking을 직접 구성했습니다.
-- **백엔드 구조화 / Backend structure**: route handling, service policy, shared validation을 분리했습니다.
-- **신뢰성 사고 / Reliability mindset**: 계산 로직을 `packages/shared`에 격리하고 단위 테스트를 추가했습니다.
-- **운영 관점 / Operations awareness**: `infra/docker`에 API Dockerfile, Caddy reverse proxy, compose 구성을 포함했습니다.
+- **작업면 중심 구성 / Workspace-first composition**: 첫 화면을 랜딩 페이지가 아닌 실제 운영 콘솔로 구성했습니다.
+- **직접 구성한 UI 시스템 / Hand-built UI system**: UI kit 없이 responsive layout, rail navigation, state badge, mobile stacking을 구현했습니다.
+- **분리된 API 경계 / Layered API boundary**: route handling, service policy, shared validation을 분리했습니다.
+- **검증 가능한 계산 정책 / Testable calculation policy**: 계산 로직을 `packages/shared`에 격리하고 단위 테스트를 추가했습니다.
+- **운영 가능한 배포 구조 / Deployable infrastructure shape**: `infra/docker`에 API Dockerfile, Caddy reverse proxy, compose 구성을 포함했습니다.
 
 ## 🎛️ UI/UX
 
